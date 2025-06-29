@@ -8,7 +8,7 @@ import { useMutation, useRedo, useStorage, useUndo } from '@liveblocks/react';
 import { LiveMap } from '@liveblocks/client';
 import { handleDelete, handleKeyDown } from './lib/key-events';
 import { defaultNavElement } from './lib/constants';
-import LeftSidebar from './components/sidebars/Leftsidebar';
+import LeftSidebar from './components/sidebars/LeftSidebar';
 
 function App() {
   const [activeElement, setActiveElement] = useState({
