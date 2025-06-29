@@ -6,44 +6,16 @@ import {
 } from "@mui/material";
 import "./navbar.scss";
 
-const ShapeDropdown = ({
+const ToolbarMenu = ({
   item,
+  anchorEl,
   activeElement,
+  handleMenuClose,
   handleActiveElement,
-  handleImageUpload,
-  imageInputRef,
-  ICON_SIZE,
 }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  }
-
-  const isDropdownElem = item.value.some(
-    elem => elem?.value === activeElement.value
-  )
   return (
-    <>
-      <div className="shape-dropdown-main-container">
-        <div 
-          className={`menu-btn menu-border-radius ${isDropdownElem ? "active-item" : ""}`} 
-          onClick={handleMenuOpen}
-        >
-            <img
-              src={isDropdownElem ? activeElement.icon : item.icon}
-              alt={item.name}
-              fill
-              height={`${ICON_SIZE}px`} width={`${ICON_SIZE}px`}
-            />
-        </div>
-
-        <Menu 
+<Menu 
         anchorEl={anchorEl}
         open={open}
         onClose={handleMenuClose}
@@ -81,6 +53,51 @@ const ShapeDropdown = ({
               </MenuItem>
           ))}
         </Menu>
+  )
+}
+const ShapeDropdown = ({
+  item,
+  activeElement,
+  handleActiveElement,
+  handleImageUpload,
+  imageInputRef,
+  ICON_SIZE,
+}) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  }
+
+  const isDropdownElem = item.value.some(
+    elem => elem?.value === activeElement.value
+  )
+  return (
+    <>
+      <div className="shape-dropdown-main-container">
+        <div 
+          className={`menu-btn menu-border-radius ${isDropdownElem ? "active-item" : ""}`} 
+          onClick={handleMenuOpen}
+        >
+            <img
+              src={isDropdownElem ? activeElement.icon : item.icon}
+              alt={item.name}
+              fill
+              height={`${ICON_SIZE}px`} width={`${ICON_SIZE}px`}
+            />
+        </div>
+
+        <ToolbarMenu
+          item={item}
+          anchorEl={anchorEl}
+          activeElement={activeElement}
+          handleMenuClose={handleMenuClose}
+          handleActiveElement={handleActiveElement}
+        />
       </div>
 
       <input

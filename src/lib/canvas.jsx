@@ -1,8 +1,8 @@
-import { Canvas, util } from 'fabric';
+import { Canvas, util, PencilBrush } from 'fabric';
 import { v4 as uuid4 } from "uuid"
 
 import { defaultNavElement } from "./constants"
-import { createSpecificShape } from "./shapes"
+import { createFreeform, createSpecificShape } from "./shapes"
 
 export const initializeFabric = ({ fabricRef, canvasRef }) => {
   const canvasElement = document.getElementById("canvas")
@@ -22,14 +22,19 @@ export const handleCanvasMouseDown = ({
   isDrawing,
   shapeRef
 }) => {
+  if(!canvas) return;
+
   const pointer = canvas.getPointer(options.e)
   const target = canvas.findTarget(options.e, false)
   canvas.isDrawingMode = false
 
   if (selectedShapeRef.current === "freeform") {
-    isDrawing.current = true
-    canvas.isDrawingMode = true
-    canvas.freeDrawingBrush.width = 5
+    isDrawing.current = true;
+    canvas.isDrawingMode = true;
+    canvas.freeDrawingBrush = new PencilBrush(canvas);
+    canvas.freeDrawingBrush.width = 5;
+    //  shapeRef.current = createFreeform()
+    // canvas.add()
     return
   }
 
@@ -147,6 +152,7 @@ export const handleCanvasObjectModified = ({ options, syncShapeInStorage }) => {
 }
 
 export const handlePathCreated = ({ options, syncShapeInStorage }) => {
+  console.log('==================options',options)
   const path = options.path
   if (!path) return
 

@@ -1,7 +1,15 @@
-import { Rect, Circle, Triangle, Line, IText, Image  } from 'fabric';
+import { Rect, Circle, Triangle, Line, IText, Image, Path  } from 'fabric';
 import { v4 as uuidv4 } from "uuid";
 
-
+export const createFreeform = (pathData, options = {}) => {
+  return new Path(pathData, {
+    fill: null,
+    stroke: "#aabbcc",
+    strokeWidth: 2,
+    objectId: uuidv4(),
+    ...options
+  });
+};
 
 export const createTriangle = pointer => {
   return new Triangle({

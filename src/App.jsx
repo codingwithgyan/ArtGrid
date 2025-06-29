@@ -3,27 +3,40 @@ import { useEffect, useRef } from 'react';
 import './App.css';
 import Navbar from './components/navbar/navbar';
 import Live from './Live';
-import { initializeFabric, handleCanvasMouseDown, handleResize, handleCanvaseMouseMove, handleCanvasMouseUp, renderCanvas, handleCanvasObjectModified } from './lib/canvas';
-import { useMutation, useStorage } from '@liveblocks/react';
+import { initializeFabric, handleCanvasMouseDown, handleResize, handleCanvaseMouseMove, handleCanvasMouseUp, renderCanvas, handleCanvasObjectModified, handlePathCreated, handleCanvasZoom, handleCanvasObjectScaling, handleCanvasSelectionCreated, handleCanvasObjectMoving } from './lib/canvas';
+import { useMutation, useRedo, useStorage, useUndo } from '@liveblocks/react';
 import { LiveMap } from '@liveblocks/client';
-import { handleDelete } from './lib/key-events';
+import { handleDelete, handleKeyDown } from './lib/key-events';
 import { defaultNavElement } from './lib/constants';
+import LeftSidebar from './components/sidebars/Leftsidebar';
 
 function App() {
   const [activeElement, setActiveElement] = useState({
     name: '',
     value: '',
     icon: '',
-  })
+  });
+   const [elementAttributes, setElementAttributes] = useState({
+    width: "",
+    height: "",
+    fontFamily: "",
+    fontWeight: "",
+    fontSize: "",
+    stroke: "#aabbcc",
+    fill: "#aabbcc",
+  });
   const canvasRef = useRef(null);
   const fabricRef = useRef(null);
   const isDrawing = useRef(false);
   const shapeRef = useRef(null);
+  const isEditingRef = useRef(false);
   const selectedShapeRef = useRef(null);
   const activeObjectRef = useRef(null);
+  const undo = useUndo();
+  const redo = useRedo();
   
   const canvasObjects = useStorage((root)=>root.canvasObject);
-
+  console.log("===============canvasObjects",canvasObjects)
   // Sync objects
   const syncShapeInStorage = useMutation(({storage}, object) => {
     if(!object) 
@@ -66,11 +79,14 @@ function App() {
     switch(elem?.value) {
       case "reset":
         deleteAllObjects();
+        fabricRef.current?.clear()
         setActiveElement(defaultNavElement)
         break;
       case "delete":
         handleDelete(fabricRef.current, deleteShapeFromStorage)
         break;  
+      default:
+        break;
     }
   }
 
@@ -121,10 +137,56 @@ function App() {
         options,
         syncShapeInStorage,
       })
-    })
+    });
+
+    canvas.on("path:created", (options) => {
+      handlePathCreated({
+        options,
+        syncShapeInStorage,
+      });
+    });
+
+    canvas?.on("object:moving", (options) => {
+      handleCanvasObjectMoving({
+        options,
+      });
+    });
+
+    canvas.on("selection:created", (options) => {
+      handleCanvasSelectionCreated({
+        options,
+        isEditingRef,
+        setElementAttributes,
+      });
+    });
+
+    canvas.on("object:scaling", (options) => {
+      handleCanvasObjectScaling({
+        options,
+        setElementAttributes,
+      });
+    });
+
+    canvas.on("mouse:wheel", (options) => {
+      handleCanvasZoom({
+        options,
+        canvas,
+      });
+    });
 
     window.addEventListener("resize",()=>{
       handleResize({fabricRef})
+    })
+
+    window.addEventListener("keydown",(event)=>{
+      handleKeyDown({
+        e: event,
+        canvas: fabricRef?.current,
+        undo,
+        redo,
+        syncShapeInStorage,
+        deleteShapeFromStorage,
+      })
     })
 
     return () => {
@@ -143,6 +205,7 @@ function App() {
   return (
     <main className='app-main-container'>
       <Navbar activeElement={activeElement} handleActiveElement={handleActiveElement}/>
+      <LeftSidebar allShapes={canvasObjects ? Array?.from(canvasObjects) : []}/>
       <Live canvasRef={canvasRef}/>
     </main>
   )

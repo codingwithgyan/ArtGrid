@@ -9,8 +9,6 @@ import {
 import './index.css'
 import App from './App.jsx'
 import { LiveMap } from '@liveblocks/client';
-"use client";
-
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

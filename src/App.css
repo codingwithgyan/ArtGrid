@@ -9,14 +9,13 @@
   display: none;
 }
 .live-main-container, #canvas {
-  width: 100vw;
-  height: 90vh;
+  width: 80vw;
+  height: 91vh;
   margin: 0;
   padding: 0;
   position: fixed;
   top: 70px;
-  left: 0;
-  border: 1px solid red;
+  left: 20vw;
 }
 
 .live-main-container canvas {
